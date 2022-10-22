@@ -1,9 +1,9 @@
 import sys
+from PyQt5 import QtWidgets, uic, QtGui
+from PyQt5.QtWidgets import QMessageBox, QListWidgetItem
 
-from PyQt5 import QtWidgets, uic
-from PyQt5.QtWidgets import QMessageBox
 
-from db_opertions import add_user, login
+from db_opertions import add_user, login, load_tasks, load_task_detail
 
 
 def except_hook(cls, exception, traceback):
@@ -20,6 +20,7 @@ class AuthWindow(QtWidgets.QWidget):
         self.reg_button.clicked.connect(self.registration)
         self.auth_button.clicked.connect(self.auth)
 
+
     def registration(self):
         username = self.username_edit.text()
         password = self.password_edit.text()
@@ -33,8 +34,9 @@ class AuthWindow(QtWidgets.QWidget):
         username = self.username_edit.text()
         password = self.password_edit.text()
         if login(username, password):
-            tasks_window = TasksWindow()
-            tasks_window.show()
+            self.tasks_window = TasksWindow()
+            self.tasks_window.show()
+            self.hide()
         else:
             dialog = QMessageBox()
             dialog.setText('Вход не выполнен')
@@ -46,14 +48,26 @@ class TasksWindow(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         uic.loadUi('tasks.ui', self)
-    # self.reg_button.clicked.connect(self.registration)
-    # self.auth_button.clicked.connect(self.auth)
+        self.load_tasks_button.clicked.connect(self.load_tasks)
+        self.tasks_list.itemClicked.connect(self.load_task_detail)
+
+    def load_tasks(self):
+        tasks = load_tasks()
+        self.tasks_list.clear()
+        for task in tasks:
+            self.tasks_list.addItem(QListWidgetItem(f'{task[0]} {task[2]}'))
+
+    def load_task_detail(self, item):
+        id = item.text().split()[0]
+        task = load_task_detail(id)
+        print(task)
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
     auth_window = AuthWindow()
     auth_window.show()
+
     sys.exit(app.exec_())
 
 
