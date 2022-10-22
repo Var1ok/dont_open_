@@ -1,5 +1,6 @@
 import sys
-from PyQt5 import QtWidgets, uic, QtGui
+
+from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import QMessageBox
 
 from db_opertions import add_user, login
@@ -19,7 +20,6 @@ class AuthWindow(QtWidgets.QWidget):
         self.reg_button.clicked.connect(self.registration)
         self.auth_button.clicked.connect(self.auth)
 
-
     def registration(self):
         username = self.username_edit.text()
         password = self.password_edit.text()
@@ -33,15 +33,22 @@ class AuthWindow(QtWidgets.QWidget):
         username = self.username_edit.text()
         password = self.password_edit.text()
         if login(username, password):
-            dialog = QMessageBox()
-            dialog.setText('Вход выполнен')
-            dialog.setIcon(1)
-            dialog.exec()
+            tasks_window = TasksWindow()
+            tasks_window.show()
         else:
             dialog = QMessageBox()
             dialog.setText('Вход не выполнен')
             dialog.setIcon(3)
             dialog.exec()
+
+
+class TasksWindow(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi('tasks.ui', self)
+    # self.reg_button.clicked.connect(self.registration)
+    # self.auth_button.clicked.connect(self.auth)
+
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
